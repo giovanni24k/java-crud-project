@@ -24,14 +24,14 @@ import com.giovanni.entity.User;
 import com.giovanni.repositories.UserRepository;
 
 @RestController()
-@RequestMapping("/api")
+@RequestMapping("/api/user")
 
 public class UserController {
 
 	@Autowired
 	UserRepository userRepository;
-	
-	@GetMapping("/users")
+
+	@GetMapping("/get")
 	public ResponseEntity<List<User>> getAllUsers(){
 		try {
 			List<User> users = new ArrayList<User>();
@@ -41,11 +41,11 @@ public class UserController {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	
-	@GetMapping("/users/{id}")
+
+
+	@GetMapping("/get/{id}")
 	public ResponseEntity<User> getUserById(@PathVariable("id") long id) {
-		
+
 		Optional<User> userData = userRepository.findById(id);
 		if (userData.isPresent()) {
 			return new ResponseEntity<>(userData.get(), HttpStatus.OK);
@@ -53,9 +53,9 @@ public class UserController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
-	
-	
-	@PostMapping("/user")
+
+
+	@PostMapping("/create")
 	public ResponseEntity<User> createUser(@RequestBody User user) {
 		try {
 			User _user = userRepository
@@ -65,12 +65,12 @@ public class UserController {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	
-	@PutMapping("/users/{id}")
+
+
+	@PutMapping("/update/{id}")
 	public ResponseEntity<User> updateUser(@PathVariable("id") long id, @RequestBody User user) {
 		Optional<User> userData = userRepository.findById(id);
-		
+
 		if (userData.isPresent()) {
 			User _user = userData.get();
 			_user.setName(user.getName());
@@ -81,9 +81,9 @@ public class UserController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
-	
-	
-	@DeleteMapping("/user/{id}")
+
+
+	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") long id) {
 		try {
 			userRepository.deleteById(id);
@@ -92,9 +92,9 @@ public class UserController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	
-	@DeleteMapping("/users")
+
+
+	@DeleteMapping("/delete")
 	public ResponseEntity<HttpStatus> deleteAllUsers() {
 		try {
 			userRepository.deleteAll();
@@ -103,8 +103,24 @@ public class UserController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	
-	
-	
+
+
+
+	@PostMapping("/login")
+	public ResponseEntity<User> login(@RequestBody User user) {
+		User user1 = userRepository.findByName(user.getName());
+		user1 = userRepository.findByPassword(user.getPassword());
+
+		try {			
+			if (user1 != null) {
+				return new ResponseEntity<>(user1, HttpStatus.OK);
+			}
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+
 }
